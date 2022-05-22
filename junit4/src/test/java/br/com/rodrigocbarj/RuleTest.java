@@ -19,7 +19,7 @@ public class RuleTest {
     public void shouldCreateNewFileInTemporaryFolder() throws IOException {
         File created = tmpFolder.newFile("file.txt");
 
-        assertTrue(created.isFile());
-        assertEquals(tmpFolder.getRoot(), created.getParentFile());
+        assertTrue(created.isFile()); // teste verifica se o arquivo existe
+        assertEquals(tmpFolder.getRoot(), created.getParentFile()); // teste compara o root do objeto com o do arquivo
     }
 }
