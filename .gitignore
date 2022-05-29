@@ -67,3 +67,4 @@ buildNumber.properties
 
 ### IntelliJ IDEA ###
 .idea
+junit4.iml
