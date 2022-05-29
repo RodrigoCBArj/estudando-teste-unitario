@@ -57,13 +57,13 @@ buildNumber.properties
 # Built Visual Studio Code Extensions
 *.vsix
 
-### VisualStudioCode Patch ###
-# Ignore all local history of files
+### VisualStudioCode ###
 .history
 .ionide
-
-# Support for Project snippet scope
-.vscode/*.code-snippets
+.vscode
 
 # Ignore code-workspaces
 *.code-workspace
+
+### IntelliJ IDEA ###
+.idea
