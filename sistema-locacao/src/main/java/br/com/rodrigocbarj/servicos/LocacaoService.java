@@ -27,8 +27,4 @@ public class LocacaoService {
 		
 		return locacao;
 	}
-
-	public static void main(String[] args) {
-		
-	}
 }
