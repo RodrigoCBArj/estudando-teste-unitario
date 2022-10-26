@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.util.Date;
 
+import static br.com.rodrigocbarj.utils.DataUtils.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
@@ -34,7 +35,7 @@ public class LocacaoServiceTest {
         assertEquals(locacao.getUsuario(), u);
         assertThat(locacao.getValor(), is(12.55));
         assertThat(locacao.getValor(), is(not(0)));
-        assertTrue(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()));
-        assertTrue(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)));
+        assertTrue( isMesmaData(locacao.getDataLocacao(), new Date()) );
+        assertTrue( isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)) );
     }
 }
