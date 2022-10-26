@@ -3,6 +3,8 @@ package br.com.rodrigocbarj.servicos;
 import br.com.rodrigocbarj.entidades.Usuario;
 import br.com.rodrigocbarj.entidades.Filme;
 import br.com.rodrigocbarj.entidades.Locacao;
+import br.com.rodrigocbarj.exceptions.FilmeSemEstoqueException;
+import br.com.rodrigocbarj.exceptions.LocadoraException;
 
 import java.util.Date;
 
@@ -10,10 +12,17 @@ import static br.com.rodrigocbarj.utils.DataUtils.adicionarDias;
 
 public class LocacaoService {
 	
-	public Locacao alugarFilme(Usuario usuario, Filme filme) throws Exception {
+	public Locacao alugarFilme(Usuario usuario, Filme filme)
+			throws LocadoraException, FilmeSemEstoqueException
+	{
+		if (usuario == null)
+			throw new LocadoraException("Usuário inexistente!");
+
+		if (filme == null)
+			throw new LocadoraException("Filme inexistente!");
 
 		if (filme.getEstoque() == 0 || filme.getEstoque() == null)
-			throw new Exception("Filme sem estoque!");
+			throw new FilmeSemEstoqueException();
 
 		Locacao locacao = new Locacao();
 		locacao.setFilme(filme);

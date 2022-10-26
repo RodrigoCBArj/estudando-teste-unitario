@@ -7,6 +7,8 @@ package br.com.rodrigocbarj.servicos;
 import br.com.rodrigocbarj.entidades.Filme;
 import br.com.rodrigocbarj.entidades.Locacao;
 import br.com.rodrigocbarj.entidades.Usuario;
+import br.com.rodrigocbarj.exceptions.FilmeSemEstoqueException;
+import br.com.rodrigocbarj.exceptions.LocadoraException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -48,42 +50,43 @@ public class LocacaoServiceTest {
         error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
     }
 
-    @Test(expected = Exception.class) // verificação elegante =)
-    public void testFilmeSemEstoque() throws Exception {
-        // cenario
-        LocacaoService service = new LocacaoService();
-        Usuario u = new Usuario("Usuario 1");
-        Filme f = new Filme("Filme 1", 0, 12.55);
-
-        // ação
-        service.alugarFilme(u, f);
-    }
     @Test
-    public void testFilmeSemEstoque2() {
+    public void testeLocacaoSemUsuario() throws FilmeSemEstoqueException {
         // cenario
         LocacaoService service = new LocacaoService();
-        Usuario u = new Usuario("Usuario 1");
-        Filme f = new Filme("Filme 1", 0, 12.55);
+        Filme f = new Filme("Filme 1", 20, 8.99);
 
         // ação
         try {
-            service.alugarFilme(u, f);
-            fail("Deveria ter lançado uam excessao");
-        } catch (Exception e) {
-            // verificação
-            assertThat(e.getMessage(), is("Filme sem estoque!"));
+            service.alugarFilme(null, f);
+
+            // validações:
+            fail("Deveria lançar excessão para usuário nulo/inexistente.");
+        } catch (LocadoraException e) {
+            assertThat(e.getMessage(), is("Usuário inexistente!"));
         }
     }
 
     @Test
-    public void testFilmeSemEstoque3() throws Exception {
+    public void testeLocacaoSemFilme() throws FilmeSemEstoqueException, LocadoraException {
+        // cenario
+        LocacaoService service = new LocacaoService();
+        Usuario u = new Usuario("Usuario 1");
+
+        //verificação (dessa forma, precisa ser declarado antes da ação)
+        exception.expect(LocadoraException.class);
+        exception.expectMessage("Filme inexistente!");
+
+        // ação
+        service.alugarFilme(u, null);
+    }
+
+    @Test(expected = FilmeSemEstoqueException.class) // verificação elegante =)
+    public void testeFilmeSemEstoque() throws Exception {
         // cenario
         LocacaoService service = new LocacaoService();
         Usuario u = new Usuario("Usuario 1");
         Filme f = new Filme("Filme 1", 0, 12.55);
-
-        exception.expect(Exception.class);
-        exception.expectMessage("Filme sem estoque!");
 
         // ação
         service.alugarFilme(u, f);
