@@ -10,6 +10,7 @@ import br.com.rodrigocbarj.entidades.Usuario;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.junit.rules.ExpectedException;
 
 import java.util.Date;
 
@@ -17,12 +18,15 @@ import static br.com.rodrigocbarj.utils.DataUtils.isMesmaData;
 import static br.com.rodrigocbarj.utils.DataUtils.obterDataComDiferencaDias;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class LocacaoServiceTest {
 
     @Rule
     public ErrorCollector error = new ErrorCollector();
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void teste() throws Exception {
@@ -42,5 +46,46 @@ public class LocacaoServiceTest {
         error.checkThat(locacao.getValor(), is(not(0)));
         error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
         error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
+    }
+
+    @Test(expected = Exception.class) // verificação elegante =)
+    public void testFilmeSemEstoque() throws Exception {
+        // cenario
+        LocacaoService service = new LocacaoService();
+        Usuario u = new Usuario("Usuario 1");
+        Filme f = new Filme("Filme 1", 0, 12.55);
+
+        // ação
+        service.alugarFilme(u, f);
+    }
+    @Test
+    public void testFilmeSemEstoque2() {
+        // cenario
+        LocacaoService service = new LocacaoService();
+        Usuario u = new Usuario("Usuario 1");
+        Filme f = new Filme("Filme 1", 0, 12.55);
+
+        // ação
+        try {
+            service.alugarFilme(u, f);
+            fail("Deveria ter lançado uam excessao");
+        } catch (Exception e) {
+            // verificação
+            assertThat(e.getMessage(), is("Filme sem estoque!"));
+        }
+    }
+
+    @Test
+    public void testFilmeSemEstoque3() throws Exception {
+        // cenario
+        LocacaoService service = new LocacaoService();
+        Usuario u = new Usuario("Usuario 1");
+        Filme f = new Filme("Filme 1", 0, 12.55);
+
+        exception.expect(Exception.class);
+        exception.expectMessage("Filme sem estoque!");
+
+        // ação
+        service.alugarFilme(u, f);
     }
 }
