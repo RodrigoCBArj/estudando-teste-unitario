@@ -1,4 +1,8 @@
 package br.com.rodrigocbarj.servicos;
+/* é importante que os testes estejam numa estrutura de pacotes iguais as do seu teste,
+ * pois assim o Java permitirá que a classe de teste tenha acesso às variáveis
+ * default, public e protected, da classe testada. [Variáveis private não é possível ter acesso]
+ */
 
 import br.com.rodrigocbarj.entidades.Filme;
 import br.com.rodrigocbarj.entidades.Locacao;
@@ -14,15 +18,18 @@ public class LocacaoServiceTest {
     @Test
     public void teste() {
 
+        // cenario
         LocacaoService locacao = new LocacaoService();
-        Usuario u = new Usuario("Teste Um");
+        Usuario u = new Usuario("Usuario 1");
         Filme f = new Filme("Filme 1", 1, 12.55);
 
+        // ação
         Locacao teste = locacao.alugarFilme(u, f);
 
+        // verificações
         Assert.assertTrue(teste.getFilme().equals(f));
         Assert.assertTrue(teste.getUsuario().equals(u));
-        Assert.assertTrue(teste.getValor().equals(12.55));
+        Assert.assertTrue(teste.getValor() == 12.55);
         Assert.assertTrue(DataUtils.isMesmaData(teste.getDataLocacao(), new Date()));
         Assert.assertTrue(DataUtils.isMesmaData(teste.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)));
     }
