@@ -27,9 +27,9 @@ public class LocacaoServiceTest {
         Locacao teste = locacao.alugarFilme(u, f);
 
         // verificações
-        Assert.assertTrue(teste.getFilme().equals(f));
-        Assert.assertTrue(teste.getUsuario().equals(u));
-        Assert.assertTrue(teste.getValor() == 12.55);
+        Assert.assertEquals(teste.getFilme(), f);
+        Assert.assertEquals(teste.getUsuario(), u);
+        Assert.assertEquals(12.55, teste.getValor(), 0.01); // [experado], [atual], [margem de erro]
         Assert.assertTrue(DataUtils.isMesmaData(teste.getDataLocacao(), new Date()));
         Assert.assertTrue(DataUtils.isMesmaData(teste.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)));
     }
