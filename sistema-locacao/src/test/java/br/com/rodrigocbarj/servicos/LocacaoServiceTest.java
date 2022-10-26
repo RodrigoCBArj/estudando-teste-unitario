@@ -7,17 +7,22 @@ package br.com.rodrigocbarj.servicos;
 import br.com.rodrigocbarj.entidades.Filme;
 import br.com.rodrigocbarj.entidades.Locacao;
 import br.com.rodrigocbarj.entidades.Usuario;
-import br.com.rodrigocbarj.utils.DataUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 
 import java.util.Date;
 
-import static br.com.rodrigocbarj.utils.DataUtils.*;
+import static br.com.rodrigocbarj.utils.DataUtils.isMesmaData;
+import static br.com.rodrigocbarj.utils.DataUtils.obterDataComDiferencaDias;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class LocacaoServiceTest {
+
+    @Rule
+    public ErrorCollector error = new ErrorCollector();
 
     @Test
     public void teste() {
@@ -33,9 +38,9 @@ public class LocacaoServiceTest {
         // verificações
         assertEquals(locacao.getFilme(), f);
         assertEquals(locacao.getUsuario(), u);
-        assertThat(locacao.getValor(), is(12.55));
-        assertThat(locacao.getValor(), is(not(0)));
-        assertTrue( isMesmaData(locacao.getDataLocacao(), new Date()) );
-        assertTrue( isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)) );
+        error.checkThat(locacao.getValor(), is(12.55));
+        error.checkThat(locacao.getValor(), is(not(0)));
+        error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
+        error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
     }
 }
