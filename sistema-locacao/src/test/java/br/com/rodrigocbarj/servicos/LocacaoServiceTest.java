@@ -25,12 +25,12 @@ public class LocacaoServiceTest {
     public ErrorCollector error = new ErrorCollector();
 
     @Test
-    public void teste() {
+    public void teste() throws Exception {
 
         // cenario
         LocacaoService service = new LocacaoService();
         Usuario u = new Usuario("Usuario 1");
-        Filme f = new Filme("Filme 1", 1, 12.55);
+        Filme f = new Filme("Filme 1", 2, 12.55);
 
         // ação
         Locacao locacao = service.alugarFilme(u, f);
