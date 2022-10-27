@@ -9,8 +9,7 @@ import br.com.rodrigocbarj.entidades.Locacao;
 import br.com.rodrigocbarj.entidades.Usuario;
 import br.com.rodrigocbarj.exceptions.FilmeSemEstoqueException;
 import br.com.rodrigocbarj.exceptions.LocadoraException;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
@@ -24,17 +23,43 @@ import static org.junit.Assert.*;
 
 public class LocacaoServiceTest {
 
+    private LocacaoService service;
+
     @Rule
     public ErrorCollector error = new ErrorCollector();
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
+    // roda antes de cada teste dessa classe
+    @Before
+    public void setup() {
+        System.out.println("before");
+        service = new LocacaoService();
+    }
+
+    // roda depois de cada teste dessa classe
+    @After
+    public void tearDown() {
+        System.out.println("after");
+    }
+
+    // roda uma vez, antes de rodar o primeiro teste da classe
+    @BeforeClass
+    public static void setupClass() {
+        System.out.println("before class");
+    }
+
+    // roda uma vez, depois de rodar o ultimo teste da classe
+    @AfterClass
+    public static void tearDownClass() {
+        System.out.println("after class");
+    }
+
     @Test
     public void teste() throws Exception {
 
         // cenario
-        LocacaoService service = new LocacaoService();
         Usuario u = new Usuario("Usuario 1");
         Filme f = new Filme("Filme 1", 2, 12.55);
 
@@ -53,7 +78,6 @@ public class LocacaoServiceTest {
     @Test
     public void testeLocacaoSemUsuario() throws FilmeSemEstoqueException {
         // cenario
-        LocacaoService service = new LocacaoService();
         Filme f = new Filme("Filme 1", 20, 8.99);
 
         // ação
@@ -70,7 +94,6 @@ public class LocacaoServiceTest {
     @Test
     public void testeLocacaoSemFilme() throws FilmeSemEstoqueException, LocadoraException {
         // cenario
-        LocacaoService service = new LocacaoService();
         Usuario u = new Usuario("Usuario 1");
 
         //verificação (dessa forma, precisa ser declarado antes da ação)
@@ -84,7 +107,6 @@ public class LocacaoServiceTest {
     @Test(expected = FilmeSemEstoqueException.class) // verificação elegante =)
     public void testeFilmeSemEstoque() throws Exception {
         // cenario
-        LocacaoService service = new LocacaoService();
         Usuario u = new Usuario("Usuario 1");
         Filme f = new Filme("Filme 1", 0, 12.55);
 
