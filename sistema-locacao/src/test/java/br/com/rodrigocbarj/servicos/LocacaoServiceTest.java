@@ -25,6 +25,8 @@ public class LocacaoServiceTest {
 
     private LocacaoService service;
 
+    private int contador = 0;
+
     @Rule
     public ErrorCollector error = new ErrorCollector();
 
@@ -42,6 +44,10 @@ public class LocacaoServiceTest {
     @After
     public void tearDown() {
         System.out.println("after");
+        contador++;
+        System.out.println(contador);
+        /* o contador apresenta "1" em cada repetição, pois o JUnit "reinicia" as variáveis (não estáticas) sempre
+         que um teste é finalizado, para garantir que nenhuma mudança de um teste implique em outro teste */
     }
 
     // roda uma vez, antes de rodar o primeiro teste da classe
