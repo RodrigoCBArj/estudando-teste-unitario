@@ -25,39 +25,15 @@ public class LocacaoServiceTest {
 
     private LocacaoService service;
 
-    private static int contador = 0; // variáveis estáticas não são "reiniciadas" a cada teste
-
     @Rule
     public ErrorCollector error = new ErrorCollector();
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    // roda antes de cada teste dessa classe
     @Before
     public void setup() {
-        System.out.println("before");
         service = new LocacaoService();
-    }
-
-    // roda depois de cada teste dessa classe
-    @After
-    public void tearDown() {
-        System.out.println("after");
-        contador++;
-        System.out.println(contador);
-    }
-
-    // roda uma vez, antes de rodar o primeiro teste da classe
-    @BeforeClass
-    public static void setupClass() {
-        System.out.println("before class");
-    }
-
-    // roda uma vez, depois de rodar o ultimo teste da classe
-    @AfterClass
-    public static void tearDownClass() {
-        System.out.println("after class");
     }
 
     @Test
@@ -74,7 +50,7 @@ public class LocacaoServiceTest {
         assertEquals(locacao.getFilme(), f);
         assertEquals(locacao.getUsuario(), u);
         error.checkThat(locacao.getValor(), is(12.55));
-        error.checkThat(locacao.getValor(), is(not(0)));
+//        error.checkThat(locacao.getValor(), is(not(0)));
         error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
         error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
     }
