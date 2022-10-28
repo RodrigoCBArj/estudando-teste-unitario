@@ -31,17 +31,13 @@ public class LocacaoService {
 			}
 
 			Double valorFilme = filme.getPrecoLocacao();
-			if (i == 2)	{
-				valorTotal += valorFilme * 0.75;
-			} else if (i == 3) {
-				valorTotal += valorFilme * 0.50;
-			} else if (i == 4) {
-				valorTotal += valorFilme * 0.25;
-			} else if (i == 5) {
-				valorTotal += valorFilme * 0;
-			} else {
-				valorTotal += valorFilme;
+			switch (i) {
+				case 2: valorFilme = valorFilme * 0.75; break;
+				case 3: valorFilme = valorFilme * 0.50; break;
+				case 4: valorFilme = valorFilme * 0.25; break;
+				case 5: valorFilme = 0.0; break;
 			}
+			valorTotal += valorFilme;
 		}
 
 		Locacao locacao = new Locacao();
