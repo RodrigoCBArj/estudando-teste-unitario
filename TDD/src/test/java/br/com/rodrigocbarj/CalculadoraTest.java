@@ -25,4 +25,14 @@ public class CalculadoraTest {
         // verificação
         assertEquals(8, resultado);
     }
+
+    @Test
+    public void subtrairDoisValores() {
+        int x = 8;
+        int y = 3;
+
+        int resultado = calculadora.subtrair(x, y);
+
+        assertEquals(5, resultado);
+    }
 }
