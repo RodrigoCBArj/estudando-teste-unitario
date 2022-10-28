@@ -24,11 +24,18 @@ public class LocacaoService {
 		if (filmes == null || filmes.isEmpty())
 			throw new LocadoraException("Filme inexistente!");
 
-		for (Filme filme : filmes) {
+		for (int i = 0; i < filmes.size(); i++) {
+			Filme filme = filmes.get(i);
 			if (filme.getEstoque() == 0 || filme.getEstoque() == null) {
 				throw new FilmeSemEstoqueException();
 			}
-			valorTotal += filme.getPrecoLocacao();
+
+			Double valorFilme = filme.getPrecoLocacao();
+			if (i == 2)	{
+				valorTotal += valorFilme * 0.75;
+			} else {
+				valorTotal += valorFilme;
+			}
 		}
 
 		Locacao locacao = new Locacao();
