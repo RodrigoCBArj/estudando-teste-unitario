@@ -151,4 +151,21 @@ public class LocacaoServiceTest {
 
         error.checkThat(resultado.getValor(), is(14.0));
     }
+
+    @Test
+    public void devePagarNadaNo6Filme()
+            throws FilmeSemEstoqueException, LocadoraException {
+        Usuario u = new Usuario("Usuario 1");
+        List<Filme> filmes = new ArrayList<>();
+        filmes.add(new Filme("Filme 1", 1, 4.0));
+        filmes.add(new Filme("Filme 2", 2, 4.0));
+        filmes.add(new Filme("Filme 3", 3, 4.0));
+        filmes.add(new Filme("Filme 4", 4, 4.0));
+        filmes.add(new Filme("Filme 5", 5, 4.0));
+        filmes.add(new Filme("Filme 6", 6, 4.0));
+
+        Locacao resultado = service.alugarFilme(u, filmes);
+
+        error.checkThat(resultado.getValor(), is(14.0));
+    }
 }

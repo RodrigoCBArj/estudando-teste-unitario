@@ -37,6 +37,8 @@ public class LocacaoService {
 				valorTotal += valorFilme * 0.50;
 			} else if (i == 4) {
 				valorTotal += valorFilme * 0.25;
+			} else if (i == 5) {
+				valorTotal += valorFilme * 0;
 			} else {
 				valorTotal += valorFilme;
 			}
