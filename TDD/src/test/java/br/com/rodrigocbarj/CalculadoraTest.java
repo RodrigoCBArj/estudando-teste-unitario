@@ -1,9 +1,17 @@
 package br.com.rodrigocbarj;
 
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class CalculadoraTest {
+
+    Calculadora calculadora;
+    @Before
+    public void criaCalculadora() {
+        calculadora = new Calculadora();
+    }
 
     @Test
     public void deveSomarDoisValores() {
@@ -11,12 +19,10 @@ public class CalculadoraTest {
         int x = 5;
         int y = 3;
 
-        Calculadora calculadora = new Calculadora();
-
         // ação
         int resultado = calculadora.somar(x, y);
 
         // verificação
-        Assert.assertEquals(8, resultado);
+        assertEquals(8, resultado);
     }
 }
