@@ -33,6 +33,8 @@ public class LocacaoService {
 			Double valorFilme = filme.getPrecoLocacao();
 			if (i == 2)	{
 				valorTotal += valorFilme * 0.75;
+			} else if (i == 3) {
+				valorTotal += valorFilme * 0.50;
 			} else {
 				valorTotal += valorFilme;
 			}
