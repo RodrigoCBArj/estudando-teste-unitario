@@ -13,7 +13,10 @@ import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import static br.com.rodrigocbarj.utils.DataUtils.isMesmaData;
 import static br.com.rodrigocbarj.utils.DataUtils.obterDataComDiferencaDias;
@@ -41,15 +44,20 @@ public class LocacaoServiceTest {
 
         // cenario
         Usuario u = new Usuario("Usuario 1");
-        Filme f = new Filme("Filme 1", 2, 12.55);
+        List<Filme> filmes = new ArrayList<>();
+        filmes.add(new Filme("Filme 1", 2, 12.55));
+        filmes.add(new Filme("Filme 2", 4, 8.99));
+
+        Double valorTotal = 0.0;
+        for (Filme filme : filmes) valorTotal += filme.getPrecoLocacao();
 
         // ação
-        Locacao locacao = service.alugarFilme(u, f);
+        Locacao locacao = service.alugarFilme(u, filmes);
 
         // verificações
-        assertEquals(locacao.getFilme(), f);
+        assertEquals(locacao.getFilmes(), filmes);
         assertEquals(locacao.getUsuario(), u);
-        error.checkThat(locacao.getValor(), is(12.55));
+        error.checkThat(locacao.getValor(), is(valorTotal));
 //        error.checkThat(locacao.getValor(), is(not(0)));
         error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
         error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
@@ -58,11 +66,13 @@ public class LocacaoServiceTest {
     @Test
     public void testeLocacaoSemUsuario() throws FilmeSemEstoqueException {
         // cenario
-        Filme f = new Filme("Filme 1", 20, 8.99);
+        List<Filme> filmes = new ArrayList<>();
+        filmes.add(new Filme("Filme 1", 2, 12.55));
+        filmes.add(new Filme("Filme 2", 4, 8.99));
 
         // ação
         try {
-            service.alugarFilme(null, f);
+            service.alugarFilme(null, filmes);
 
             // validações:
             fail("Deveria lançar excessão para usuário nulo/inexistente.");
@@ -88,9 +98,11 @@ public class LocacaoServiceTest {
     public void testeFilmeSemEstoque() throws Exception {
         // cenario
         Usuario u = new Usuario("Usuario 1");
-        Filme f = new Filme("Filme 1", 0, 12.55);
+        List<Filme> filmes = new ArrayList<>();
+        filmes.add(new Filme("Filme 1", 2, 12.55));
+        filmes.add(new Filme("Filme 2", 0, 8.99));
 
         // ação
-        service.alugarFilme(u, f);
+        service.alugarFilme(u, filmes);
     }
 }
