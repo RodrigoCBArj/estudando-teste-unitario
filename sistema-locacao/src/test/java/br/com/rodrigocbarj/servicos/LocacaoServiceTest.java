@@ -19,9 +19,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.*;
 
-import static br.com.rodrigocbarj.matchers.MatcherProprio.caiNaSegunda;
-import static br.com.rodrigocbarj.utils.DataUtils.isMesmaData;
-import static br.com.rodrigocbarj.utils.DataUtils.obterDataComDiferencaDias;
+import static br.com.rodrigocbarj.matchers.MatcherProprio.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
@@ -58,12 +56,9 @@ public class LocacaoServiceTest {
         Locacao locacao = service.alugarFilme(u, filmes);
 
         // verificações
-        assertEquals(locacao.getFilmes(), filmes);
-        assertEquals(locacao.getUsuario(), u);
         error.checkThat(locacao.getValor(), is(valorTotal));
-//        error.checkThat(locacao.getValor(), is(not(0)));
-        error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
-        error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
+        error.checkThat(locacao.getDataLocacao(), ehHoje());
+        error.checkThat(locacao.getDataRetorno(), hojeComAdicaoDias(1));
     }
 
     @Test
@@ -106,11 +101,11 @@ public class LocacaoServiceTest {
 
         Usuario u = new Usuario("Usuario 1");
         List<Filme> filmes = new ArrayList<>(
-            Arrays.asList(new Filme("Filme 1", 1, 4.0)));
+                Arrays.asList(new Filme("Filme 1", 1, 4.0)));
 
         Locacao locacao = service.alugarFilme(u, filmes);
 
-//        error.checkThat(locacao.getDataRetorno(), caiEm(Calendar.MONDAY)); // também fincona
+//        error.checkThat(locacao.getDataRetorno(), caiEm(Calendar.MONDAY)); // também funcona
         error.checkThat(locacao.getDataRetorno(), caiNaSegunda()); // mais legível
     }
 }
