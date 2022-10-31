@@ -17,11 +17,9 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import static br.com.rodrigocbarj.matchers.MatcherProprio.caiNaSegunda;
 import static br.com.rodrigocbarj.utils.DataUtils.isMesmaData;
 import static br.com.rodrigocbarj.utils.DataUtils.obterDataComDiferencaDias;
 import static org.hamcrest.CoreMatchers.is;
@@ -107,12 +105,12 @@ public class LocacaoServiceTest {
         Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 
         Usuario u = new Usuario("Usuario 1");
-        List<Filme> filmes = new ArrayList<>();
-        filmes.add(new Filme("Filme 1", 1, 4.0));
+        List<Filme> filmes = new ArrayList<>(
+            Arrays.asList(new Filme("Filme 1", 1, 4.0)));
 
         Locacao locacao = service.alugarFilme(u, filmes);
 
-        boolean ehSegunda = DataUtils.verificarDiaSemana(locacao.getDataRetorno(), Calendar.MONDAY);
-        assertTrue(ehSegunda);
+//        error.checkThat(locacao.getDataRetorno(), caiEm(Calendar.MONDAY)); // também fincona
+        error.checkThat(locacao.getDataRetorno(), caiNaSegunda()); // mais legível
     }
 }
