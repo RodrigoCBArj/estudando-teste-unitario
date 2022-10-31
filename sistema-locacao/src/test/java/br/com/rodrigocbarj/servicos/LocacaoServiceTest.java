@@ -9,6 +9,8 @@ import br.com.rodrigocbarj.entidades.Locacao;
 import br.com.rodrigocbarj.entidades.Usuario;
 import br.com.rodrigocbarj.exceptions.FilmeSemEstoqueException;
 import br.com.rodrigocbarj.exceptions.LocadoraException;
+import br.com.rodrigocbarj.utils.DataUtils;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,6 +18,7 @@ import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +44,8 @@ public class LocacaoServiceTest {
 
     @Test
     public void deveAlugarFilme() throws Exception {
+        // teste não executa nos sábados
+        Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 
         // cenario
         Usuario u = new Usuario("Usuario 1");
@@ -167,5 +172,21 @@ public class LocacaoServiceTest {
         Locacao resultado = service.alugarFilme(u, filmes);
 
         error.checkThat(resultado.getValor(), is(14.0));
+    }
+
+    @Test
+    public void devedevolverNaSegundaCasoAoAlugarNoSabado()
+            throws FilmeSemEstoqueException, LocadoraException {
+        // teste só executa nos sábados
+        Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+
+        Usuario u = new Usuario("Usuario 1");
+        List<Filme> filmes = new ArrayList<>();
+        filmes.add(new Filme("Filme 1", 1, 4.0));
+
+        Locacao locacao = service.alugarFilme(u, filmes);
+
+        boolean ehSegunda = DataUtils.verificarDiaSemana(locacao.getDataRetorno(), Calendar.MONDAY);
+        assertTrue(ehSegunda);
     }
 }
