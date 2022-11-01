@@ -1,5 +1,6 @@
 package br.com.rodrigocbarj.servicos;
 
+import br.com.rodrigocbarj.daos.LocacaoDAO;
 import br.com.rodrigocbarj.entidades.Filme;
 import br.com.rodrigocbarj.entidades.Locacao;
 import br.com.rodrigocbarj.entidades.Usuario;
@@ -14,6 +15,8 @@ import java.util.List;
 import static br.com.rodrigocbarj.utils.DataUtils.adicionarDias;
 
 public class LocacaoService {
+
+	private LocacaoDAO lDAO;
 
 	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes)
 			throws LocadoraException, FilmeSemEstoqueException
@@ -57,8 +60,12 @@ public class LocacaoService {
 		locacao.setDataRetorno(dataEntrega);
 
 		//Salvando a locacao...
-		//TODO adicionar método para salvar
+		lDAO.salvar(locacao);
 
 		return locacao;
+	}
+
+	public void setLocacaoDAO(LocacaoDAO dao) {
+		this.lDAO = dao;
 	}
 }
