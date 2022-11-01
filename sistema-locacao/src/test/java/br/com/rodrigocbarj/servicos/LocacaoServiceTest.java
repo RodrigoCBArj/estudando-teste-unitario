@@ -17,7 +17,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mockito;
 
 import java.util.*;
 
@@ -28,10 +27,14 @@ import static br.com.rodrigocbarj.matchers.MatcherProprio.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LocacaoServiceTest {
 
     private LocacaoService service;
+    private LocacaoDAO dao;
+    private SerasaService serasa;
 
     @Rule
     public ErrorCollector error = new ErrorCollector();
@@ -42,8 +45,12 @@ public class LocacaoServiceTest {
     @Before
     public void setup() {
         service = new LocacaoService();
-        LocacaoDAO dao = Mockito.mock(LocacaoDAO.class);
+
+        dao = mock(LocacaoDAO.class);
         service.setLocacaoDAO(dao);
+
+        serasa = mock(SerasaService.class);
+        service.setSerasaService(serasa);
     }
 
     @Test
@@ -123,5 +130,18 @@ public class LocacaoServiceTest {
 
 //        error.checkThat(locacao.getDataRetorno(), caiEm(Calendar.MONDAY)); // também funcona
         error.checkThat(locacao.getDataRetorno(), caiNaSegunda()); // mais legível
+    }
+
+    @Test
+    public void deveLancarExcecaoSeUsuarioEstiverNegativadoSerasa() throws FilmeSemEstoqueException, LocadoraException {
+        Usuario usuario = umUsuario().finalizado();
+        List<Filme> filmes = Arrays.asList(umFilme().finalizado());
+
+        when(serasa.possuiNegativacao(usuario)).thenReturn(true);
+
+        exception.expect(LocadoraException.class);
+        exception.expectMessage("Usuário negativado!");
+
+        service.alugarFilme(usuario, filmes);
     }
 }

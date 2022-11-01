@@ -18,10 +18,15 @@ public class LocacaoService {
 
 	private LocacaoDAO lDAO;
 
+	private SerasaService serasaService;
+
 	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes)
 			throws LocadoraException, FilmeSemEstoqueException
 	{
 		Double valorTotal = 0.0;
+
+		if (serasaService.possuiNegativacao(usuario))
+			throw new LocadoraException("Usuário negativado!");
 
 		if (usuario == null)
 			throw new LocadoraException("Usuário inexistente!");
@@ -67,5 +72,9 @@ public class LocacaoService {
 
 	public void setLocacaoDAO(LocacaoDAO dao) {
 		this.lDAO = dao;
+	}
+
+	public void setSerasaService(SerasaService serasa) {
+		serasaService = serasa;
 	}
 }
