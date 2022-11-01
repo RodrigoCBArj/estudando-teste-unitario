@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static br.com.rodrigocbarj.builders.FilmeBuilder.umFilme;
+import static br.com.rodrigocbarj.builders.UsuarioBuilder.umUsuario;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
@@ -33,30 +35,30 @@ public class CalculoValorLocacaoTest {
         service = new LocacaoService();
     }
 
-    private static Filme filme1 = new Filme("Filme 1", 1, 4.0);
-    private static Filme filme2 = new Filme("Filme 2", 2, 4.0);
-    private static Filme filme3 = new Filme("Filme 3", 3, 4.0);
-    private static Filme filme4 = new Filme("Filme 4", 4, 4.0);
-    private static Filme filme5 = new Filme("Filme 5", 5, 4.0);
-    private static Filme filme6 = new Filme("Filme 6", 6, 4.0);
-    private static Filme filme7 = new Filme("Filme 7", 7, 4.0);
+    private static final Filme filme1 = umFilme().finalizado();
+    private static final Filme filme2 = umFilme().finalizado();
+    private static final Filme filme3 = umFilme().finalizado();
+    private static final Filme filme4 = umFilme().finalizado();
+    private static final Filme filme5 = umFilme().finalizado();
+    private static final Filme filme6 = umFilme().finalizado();
+    private static final Filme filme7 = umFilme().finalizado();
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> getParametros() {
-        return Arrays.asList(new Object[][] {
-            {"2 filmes - sem desconto", Arrays.asList(filme1, filme2), 8.0},
-            {"3 filmes - 25% desconto", Arrays.asList(filme1, filme2, filme3), 11.0},
-            {"4 filmes - 50% desconto", Arrays.asList(filme1, filme2, filme3, filme4), 13.0},
-            {"5 filmes - 75% desconto", Arrays.asList(filme1, filme2, filme3, filme4, filme5), 14.0},
-            {"6 filmes - 100% desconto", Arrays.asList(filme1, filme2, filme3, filme4, filme5, filme6), 14.0},
-            {"7 filmes - sem desconto", Arrays.asList(filme1, filme2, filme3, filme4, filme5, filme6, filme7), 18.0}
+        return Arrays.asList(new Object[][]{
+                {"2° filme - sem desconto", Arrays.asList(filme1, filme2), 8.0},
+                {"3° filme - 25% desconto", Arrays.asList(filme1, filme2, filme3), 11.0},
+                {"4° filme - 50% desconto", Arrays.asList(filme1, filme2, filme3, filme4), 13.0},
+                {"5° filme - 75% desconto", Arrays.asList(filme1, filme2, filme3, filme4, filme5), 14.0},
+                {"6° filme - 100% desconto",Arrays.asList(filme1, filme2, filme3, filme4, filme5, filme6), 14.0},
+                {"7° filme - sem desconto", Arrays.asList(filme1, filme2, filme3, filme4, filme5, filme6, filme7), 18.0}
         });
     }
 
     @Test
     public void deveCalcularValorLocacaoComDescontos()
             throws FilmeSemEstoqueException, LocadoraException {
-        Usuario usuario = new Usuario("Usuario 1");
+        Usuario usuario = umUsuario().finalizado();
 
         Locacao locacao = service.alugarFilme(usuario, filmes);
 
