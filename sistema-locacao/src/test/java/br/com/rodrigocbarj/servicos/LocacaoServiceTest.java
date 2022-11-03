@@ -139,16 +139,25 @@ public class LocacaoServiceTest {
 
     @Test
     public void deveLancarExcecaoSeUsuarioEstiverNegativadoSerasa()
-            throws FilmeSemEstoqueException, LocadoraException {
+            throws FilmeSemEstoqueException {
+        //cenário:
         Usuario usuario = umUsuario().finalizado();
         List<Filme> filmes = Arrays.asList(umFilme().finalizado());
 
         when(serasaService.possuiNegativacao(usuario)).thenReturn(true);
 
-        exception.expect(LocadoraException.class);
-        exception.expectMessage("Usuário negativado!");
+        //ação:
+        try {
+            locacaoService.alugarFilme(usuario, filmes);
 
-        locacaoService.alugarFilme(usuario, filmes);
+        //verificação:
+            fail("Deveria ter lançado uma LocadoraException! ");
+        } catch (LocadoraException e) {
+            error.checkThat(e.getMessage(), is("Usuário negativado!"));
+        }
+        verify(serasaService).possuiNegativacao(usuario);
+        // tomar cuidado ao usar o verify(), pois isso deixa o teste menos "flexível,
+        // nesse caso não era preciso, mas optei por utilizar apenas por questão de estudo
     }
 
     @Test
