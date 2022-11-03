@@ -163,18 +163,26 @@ public class LocacaoServiceTest {
     @Test
     public void deveNotificarLocacoesAtrasadas() {
         //cenário
-        Usuario usuario = umUsuario().finalizado();
+        Usuario usuario1 = umUsuario().finalizado();
+        Usuario usuario2 = umUsuario().comNome("Usuario em dia").finalizado();
+        Usuario usuario3 = umUsuario().comNome("Usuario em atraso").finalizado();
         List<Locacao> locacoes =
-                Arrays.asList(umaLocacao()
-                                .comUsuario(usuario)
-                                .comDataRetorno(obterDataComDiferencaDias(-1))
-                                .finalizada());
+                Arrays.asList(
+                        umaLocacao().comUsuario(usuario1).atrasada().finalizada(),
+                        umaLocacao().comUsuario(usuario2).finalizada(),
+                        umaLocacao().comUsuario(usuario3).atrasada().finalizada());
         when(locacaoDAO.obterLocacoesAtrasadas()).thenReturn(locacoes);
 
         //ação
         locacaoService.notificarAtrasos();
 
         //verificação
-        verify(emailService).notificarAtrasos(usuario);
+        verify(emailService).notificarAtrasos(usuario1);
+        verify(emailService, never()).notificarAtrasos(usuario2); //verifica se o usuario2 realmente não foi notificado
+        verify(emailService).notificarAtrasos(usuario3);
+        verifyNoMoreInteractions(emailService); // verifica se realmente não houme mais nenhuma interação com o emailService
+        verifyZeroInteractions(serasaService); // verifica se realmente não houve nenhuma interação com o serasaService
+
+        // *Importante: deixar o mínimo de verify(), só coloquei todos esses para fins de conhecimento
     }
 }

@@ -3,6 +3,7 @@ package br.com.rodrigocbarj.builders;
 import br.com.rodrigocbarj.entidades.Filme;
 import br.com.rodrigocbarj.entidades.Locacao;
 import br.com.rodrigocbarj.entidades.Usuario;
+import br.com.rodrigocbarj.utils.DataUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -34,6 +35,12 @@ public class LocacaoBuilder {
         l.setDataLocacao(new Date());
         l.setDataRetorno(obterDataComDiferencaDias(1));
         l.setValor(4.0);
+    }
+
+    public LocacaoBuilder atrasada() {
+        locacao.setDataLocacao(DataUtils.obterDataComDiferencaDias(-2));
+        locacao.setDataRetorno(DataUtils.obterDataComDiferencaDias(-1));
+        return this;
     }
 
     public LocacaoBuilder comUsuario(Usuario param) {
