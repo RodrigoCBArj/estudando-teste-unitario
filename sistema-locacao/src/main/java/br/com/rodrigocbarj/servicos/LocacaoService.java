@@ -77,16 +77,4 @@ public class LocacaoService {
 				emailService.notificarAtrasos(l.getUsuario());
 		}
 	}
-
-	public void setLocacaoDAO(LocacaoDAO dao) {
-		this.locacaoDAO = dao;
-	}
-
-	public void setSerasaService(SerasaService serasa) {
-		serasaService = serasa;
-	}
-
-	public void setEmailService(EmailService es) {
-		emailService = es;
-	}
 }

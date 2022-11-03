@@ -17,6 +17,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.*;
 
@@ -25,7 +28,6 @@ import static br.com.rodrigocbarj.builders.FilmeBuilder.umFilmeSemEstoque;
 import static br.com.rodrigocbarj.builders.LocacaoBuilder.umaLocacao;
 import static br.com.rodrigocbarj.builders.UsuarioBuilder.umUsuario;
 import static br.com.rodrigocbarj.matchers.MatcherProprio.*;
-import static br.com.rodrigocbarj.utils.DataUtils.obterDataComDiferencaDias;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -33,9 +35,14 @@ import static org.mockito.Mockito.*;
 
 public class LocacaoServiceTest {
 
+    @InjectMocks
     private LocacaoService locacaoService;
+
+    @Mock
     private LocacaoDAO locacaoDAO;
+    @Mock
     private SerasaService serasaService;
+    @Mock
     private EmailService emailService;
 
     @Rule
@@ -46,16 +53,7 @@ public class LocacaoServiceTest {
 
     @Before
     public void setup() {
-        locacaoService = new LocacaoService();
-
-        locacaoDAO = mock(LocacaoDAO.class);
-        locacaoService.setLocacaoDAO(locacaoDAO);
-
-        serasaService = mock(SerasaService.class);
-        locacaoService.setSerasaService(serasaService);
-
-        emailService = mock(EmailService.class);
-        locacaoService.setEmailService(emailService);
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
@@ -151,7 +149,7 @@ public class LocacaoServiceTest {
         try {
             locacaoService.alugarFilme(usuario, filmes);
 
-        //verificação:
+            //verificação:
             fail("Deveria ter lançado uma LocadoraException! ");
         } catch (LocadoraException e) {
             error.checkThat(e.getMessage(), is("Usuário negativado!"));

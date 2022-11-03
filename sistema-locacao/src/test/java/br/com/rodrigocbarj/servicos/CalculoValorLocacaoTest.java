@@ -10,6 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,14 +21,17 @@ import java.util.List;
 import static br.com.rodrigocbarj.builders.FilmeBuilder.umFilme;
 import static br.com.rodrigocbarj.builders.UsuarioBuilder.umUsuario;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 @RunWith(Parameterized.class)
 public class CalculoValorLocacaoTest {
 
-    private LocacaoService service;
-    private LocacaoDAO dao;
-    private SerasaService serasa;
+    @InjectMocks
+    private LocacaoService locacaoService;
+
+    @Mock
+    private LocacaoDAO locacaoDAO;
+    @Mock
+    private SerasaService serasaService;
 
     @Parameterized.Parameter//(value = 0) // (valor padrão)
     public String cenario;
@@ -36,13 +42,7 @@ public class CalculoValorLocacaoTest {
 
     @Before
     public void setup() {
-        service = new LocacaoService();
-
-        dao = mock(LocacaoDAO.class);
-        service.setLocacaoDAO(dao);
-
-        serasa = mock(SerasaService.class);
-        service.setSerasaService(serasa);
+        MockitoAnnotations.initMocks(this);
     }
 
     private static final Filme filme1 = umFilme().finalizado();
@@ -60,7 +60,7 @@ public class CalculoValorLocacaoTest {
                 {"3° filme - 25% desconto", Arrays.asList(filme1, filme2, filme3), 11.0},
                 {"4° filme - 50% desconto", Arrays.asList(filme1, filme2, filme3, filme4), 13.0},
                 {"5° filme - 75% desconto", Arrays.asList(filme1, filme2, filme3, filme4, filme5), 14.0},
-                {"6° filme - 100% desconto", Arrays.asList(filme1, filme2, filme3, filme4, filme5, filme6), 14.0},
+                {"6° filme - 100% desconto",Arrays.asList(filme1, filme2, filme3, filme4, filme5, filme6), 14.0},
                 {"7° filme - sem desconto", Arrays.asList(filme1, filme2, filme3, filme4, filme5, filme6, filme7), 18.0}
         });
     }
@@ -70,7 +70,7 @@ public class CalculoValorLocacaoTest {
             throws FilmeSemEstoqueException, LocadoraException {
         Usuario usuario = umUsuario().finalizado();
 
-        Locacao locacao = service.alugarFilme(usuario, filmes);
+        Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
 
         assertEquals(locacao.getValor(), valorTotal);
     }
