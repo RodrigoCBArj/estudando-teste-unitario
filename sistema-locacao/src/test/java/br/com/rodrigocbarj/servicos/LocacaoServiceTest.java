@@ -144,7 +144,8 @@ public class LocacaoServiceTest {
         Usuario usuario = umUsuario().finalizado();
         List<Filme> filmes = Arrays.asList(umFilme().finalizado());
 
-        when(serasaService.possuiNegativacao(usuario)).thenReturn(true);
+        when(serasaService.possuiNegativacao(any(Usuario.class))) //para qualquer instancia de Usuario
+                            .thenReturn(true);
 
         //ação:
         try {
@@ -170,6 +171,7 @@ public class LocacaoServiceTest {
                 Arrays.asList(
                         umaLocacao().comUsuario(usuario1).atrasada().finalizada(),
                         umaLocacao().comUsuario(usuario2).finalizada(),
+                        umaLocacao().comUsuario(usuario3).atrasada().finalizada(),
                         umaLocacao().comUsuario(usuario3).atrasada().finalizada());
         when(locacaoDAO.obterLocacoesAtrasadas()).thenReturn(locacoes);
 
@@ -179,7 +181,7 @@ public class LocacaoServiceTest {
         //verificação
         verify(emailService).notificarAtrasos(usuario1);
         verify(emailService, never()).notificarAtrasos(usuario2); //verifica se o usuario2 realmente não foi notificado
-        verify(emailService).notificarAtrasos(usuario3);
+        verify(emailService, times(2)).notificarAtrasos(usuario3);
         verifyNoMoreInteractions(emailService); // verifica se realmente não houme mais nenhuma interação com o emailService
         verifyZeroInteractions(serasaService); // verifica se realmente não houve nenhuma interação com o serasaService
 
