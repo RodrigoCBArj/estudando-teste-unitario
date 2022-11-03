@@ -16,9 +16,9 @@ import static br.com.rodrigocbarj.utils.DataUtils.adicionarDias;
 
 public class LocacaoService {
 
-	private LocacaoDAO lDAO;
-
+	private LocacaoDAO locacaoDAO;
 	private SerasaService serasaService;
+	private EmailService emailService;
 
 	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes)
 			throws LocadoraException, FilmeSemEstoqueException
@@ -65,16 +65,27 @@ public class LocacaoService {
 		locacao.setDataRetorno(dataEntrega);
 
 		//Salvando a locacao...
-		lDAO.salvar(locacao);
+		locacaoDAO.salvar(locacao);
 
 		return locacao;
 	}
 
+	public void notificarAtrasos() {
+		List<Locacao> locacoes = locacaoDAO.obterLocacoesAtrasadas();
+		for (Locacao l : locacoes) {
+			emailService.notificarAtrasos(l.getUsuario());
+		}
+	}
+
 	public void setLocacaoDAO(LocacaoDAO dao) {
-		this.lDAO = dao;
+		this.locacaoDAO = dao;
 	}
 
 	public void setSerasaService(SerasaService serasa) {
 		serasaService = serasa;
+	}
+
+	public void setEmailService(EmailService es) {
+		emailService = es;
 	}
 }

@@ -22,19 +22,21 @@ import java.util.*;
 
 import static br.com.rodrigocbarj.builders.FilmeBuilder.umFilme;
 import static br.com.rodrigocbarj.builders.FilmeBuilder.umFilmeSemEstoque;
+import static br.com.rodrigocbarj.builders.LocacaoBuilder.umaLocacao;
 import static br.com.rodrigocbarj.builders.UsuarioBuilder.umUsuario;
 import static br.com.rodrigocbarj.matchers.MatcherProprio.*;
+import static br.com.rodrigocbarj.utils.DataUtils.obterDataComDiferencaDias;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class LocacaoServiceTest {
 
-    private LocacaoService service;
-    private LocacaoDAO dao;
-    private SerasaService serasa;
+    private LocacaoService locacaoService;
+    private LocacaoDAO locacaoDAO;
+    private SerasaService serasaService;
+    private EmailService emailService;
 
     @Rule
     public ErrorCollector error = new ErrorCollector();
@@ -44,13 +46,16 @@ public class LocacaoServiceTest {
 
     @Before
     public void setup() {
-        service = new LocacaoService();
+        locacaoService = new LocacaoService();
 
-        dao = mock(LocacaoDAO.class);
-        service.setLocacaoDAO(dao);
+        locacaoDAO = mock(LocacaoDAO.class);
+        locacaoService.setLocacaoDAO(locacaoDAO);
 
-        serasa = mock(SerasaService.class);
-        service.setSerasaService(serasa);
+        serasaService = mock(SerasaService.class);
+        locacaoService.setSerasaService(serasaService);
+
+        emailService = mock(EmailService.class);
+        locacaoService.setEmailService(emailService);
     }
 
     @Test
@@ -65,7 +70,7 @@ public class LocacaoServiceTest {
         filmes.add(umFilme().comValor(5d).finalizado());
 
         // ação
-        Locacao locacao = service.alugarFilme(u, filmes);
+        Locacao locacao = locacaoService.alugarFilme(u, filmes);
 
         // verificações
         error.checkThat(locacao.getValor(), is(13.0));
@@ -82,7 +87,7 @@ public class LocacaoServiceTest {
 
         // ação
         try {
-            service.alugarFilme(null, filmes);
+            locacaoService.alugarFilme(null, filmes);
 
             // validações:
             fail("Deveria lançar excessão para usuário nulo/inexistente.");
@@ -102,7 +107,7 @@ public class LocacaoServiceTest {
         exception.expectMessage("Filme inexistente!");
 
         // ação
-        service.alugarFilme(u, null);
+        locacaoService.alugarFilme(u, null);
     }
 
     @Test(expected = FilmeSemEstoqueException.class)
@@ -114,7 +119,7 @@ public class LocacaoServiceTest {
         List<Filme> filmes = new ArrayList<>(Arrays.asList(umFilmeSemEstoque().finalizado()));
 
         // ação
-        service.alugarFilme(u, filmes);
+        locacaoService.alugarFilme(u, filmes);
     }
 
     @Test
@@ -126,22 +131,41 @@ public class LocacaoServiceTest {
         Usuario u = umUsuario().finalizado();
         List<Filme> filmes = new ArrayList<>(Arrays.asList(umFilme().finalizado()));
 
-        Locacao locacao = service.alugarFilme(u, filmes);
+        Locacao locacao = locacaoService.alugarFilme(u, filmes);
 
 //        error.checkThat(locacao.getDataRetorno(), caiEm(Calendar.MONDAY)); // também funcona
         error.checkThat(locacao.getDataRetorno(), caiNaSegunda()); // mais legível
     }
 
     @Test
-    public void deveLancarExcecaoSeUsuarioEstiverNegativadoSerasa() throws FilmeSemEstoqueException, LocadoraException {
+    public void deveLancarExcecaoSeUsuarioEstiverNegativadoSerasa()
+            throws FilmeSemEstoqueException, LocadoraException {
         Usuario usuario = umUsuario().finalizado();
         List<Filme> filmes = Arrays.asList(umFilme().finalizado());
 
-        when(serasa.possuiNegativacao(usuario)).thenReturn(true);
+        when(serasaService.possuiNegativacao(usuario)).thenReturn(true);
 
         exception.expect(LocadoraException.class);
         exception.expectMessage("Usuário negativado!");
 
-        service.alugarFilme(usuario, filmes);
+        locacaoService.alugarFilme(usuario, filmes);
+    }
+
+    @Test
+    public void deveNotificarLocacoesAtrasadas() {
+        //cenário
+        Usuario usuario = umUsuario().finalizado();
+        List<Locacao> locacoes =
+                Arrays.asList(umaLocacao()
+                                .comUsuario(usuario)
+                                .comDataRetorno(obterDataComDiferencaDias(-1))
+                                .finalizada());
+        when(locacaoDAO.obterLocacoesAtrasadas()).thenReturn(locacoes);
+
+        //ação
+        locacaoService.notificarAtrasos();
+
+        //verificação
+        verify(emailService).notificarAtrasos(usuario);
     }
 }
