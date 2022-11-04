@@ -136,8 +136,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void deveLancarExcecaoSeUsuarioEstiverNegativadoSerasa()
-            throws FilmeSemEstoqueException {
+    public void deveLancarExcecaoSeUsuarioEstiverNegativadoSerasa() throws Exception {
         //cenário:
         Usuario usuario = umUsuario().finalizado();
         List<Filme> filmes = Arrays.asList(umFilme().finalizado());
@@ -184,5 +183,19 @@ public class LocacaoServiceTest {
         verifyZeroInteractions(serasaService); // verifica se realmente não houve nenhuma interação com o serasaService
 
         // *Importante: deixar o mínimo de verify(), só coloquei todos esses para fins de conhecimento
+    }
+
+    @Test
+    public void deveTestarErroNoSerasa() throws Exception {
+        Usuario usuario = umUsuario().finalizado();
+        List<Filme> filmes = Arrays.asList(umFilme().finalizado());
+
+        when(serasaService.possuiNegativacao(usuario))
+                .thenThrow(new Exception("Falha na consulta!"));
+
+        exception.expect(LocadoraException.class);
+        exception.expectMessage("Problemas com o Serasa, tente novamente.");
+
+        locacaoService.alugarFilme(usuario, filmes);
     }
 }

@@ -4,5 +4,5 @@ import br.com.rodrigocbarj.entidades.Usuario;
 
 public interface SerasaService {
 
-    public boolean possuiNegativacao(Usuario usuario);
+    boolean possuiNegativacao(Usuario usuario) throws Exception;
 }
