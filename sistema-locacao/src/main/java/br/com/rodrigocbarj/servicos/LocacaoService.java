@@ -1,8 +1,9 @@
 package br.com.rodrigocbarj.servicos;
 
-import br.com.rodrigocbarj.entidades.Usuario;
+import br.com.rodrigocbarj.daos.LocacaoDAO;
 import br.com.rodrigocbarj.entidades.Filme;
 import br.com.rodrigocbarj.entidades.Locacao;
+import br.com.rodrigocbarj.entidades.Usuario;
 import br.com.rodrigocbarj.exceptions.FilmeSemEstoqueException;
 import br.com.rodrigocbarj.exceptions.LocadoraException;
 import br.com.rodrigocbarj.utils.DataUtils;
@@ -14,11 +15,18 @@ import java.util.List;
 import static br.com.rodrigocbarj.utils.DataUtils.adicionarDias;
 
 public class LocacaoService {
-	
+
+	private LocacaoDAO locacaoDAO;
+	private SerasaService serasaService;
+	private EmailService emailService;
+
 	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes)
 			throws LocadoraException, FilmeSemEstoqueException
 	{
 		Double valorTotal = 0.0;
+
+		if (serasaService.possuiNegativacao(usuario))
+			throw new LocadoraException("Usuário negativado!");
 
 		if (usuario == null)
 			throw new LocadoraException("Usuário inexistente!");
@@ -28,7 +36,7 @@ public class LocacaoService {
 
 		for (int i = 0; i < filmes.size(); i++) {
 			Filme filme = filmes.get(i);
-			if (filme.getEstoque() == 0 || filme.getEstoque() == null) {
+			if (filme.getEstoque() < 1 || filme.getEstoque() == null) {
 				throw new FilmeSemEstoqueException();
 			}
 
@@ -55,10 +63,18 @@ public class LocacaoService {
 			dataEntrega = adicionarDias(dataEntrega, 1);
 		}
 		locacao.setDataRetorno(dataEntrega);
-		
-		//Salvando a locacao...	
-		//TODO adicionar método para salvar
-		
+
+		//Salvando a locacao...
+		locacaoDAO.salvar(locacao);
+
 		return locacao;
+	}
+
+	public void notificarAtrasos() {
+		List<Locacao> locacoes = locacaoDAO.obterLocacoesAtrasadas();
+		for (Locacao l : locacoes) {
+			if (l.getDataRetorno().before(new Date()))
+				emailService.notificarAtrasos(l.getUsuario());
+		}
 	}
 }
