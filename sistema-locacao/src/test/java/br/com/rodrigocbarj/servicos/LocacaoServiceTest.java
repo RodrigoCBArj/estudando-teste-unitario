@@ -17,9 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import java.util.*;
 
@@ -29,8 +27,7 @@ import static br.com.rodrigocbarj.builders.LocacaoBuilder.umaLocacao;
 import static br.com.rodrigocbarj.builders.UsuarioBuilder.umUsuario;
 import static br.com.rodrigocbarj.matchers.MatcherProprio.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class LocacaoServiceTest {
@@ -197,5 +194,19 @@ public class LocacaoServiceTest {
         exception.expectMessage("Problemas com o Serasa, tente novamente.");
 
         locacaoService.alugarFilme(usuario, filmes);
+    }
+
+    @Test
+    public void deveProrrogarUmaLocacao() {
+        Locacao locacao = umaLocacao().finalizada();
+
+        locacaoService.prorrogarLocacao(locacao, 3);
+
+        ArgumentCaptor<Locacao> argCapt = ArgumentCaptor.forClass(Locacao.class);
+        Mockito.verify(locacaoDAO).salvar(argCapt.capture());
+        Locacao locacaoRetornada = argCapt.getValue();
+
+        error.checkThat(locacaoRetornada.getValor(), is(12.0));
+        error.checkThat(locacaoRetornada.getDataRetorno(), is(hojeComAdicaoDias(3)));
     }
 }

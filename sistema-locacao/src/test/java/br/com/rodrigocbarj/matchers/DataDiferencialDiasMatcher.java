@@ -4,6 +4,8 @@ import br.com.rodrigocbarj.utils.DataUtils;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -23,13 +25,8 @@ public class DataDiferencialDiasMatcher extends TypeSafeMatcher<Date> {
 
     @Override
     public void describeTo(Description description) {
-        Calendar data = Calendar.getInstance();
-        data.set(Calendar.DAY_OF_WEEK, qtdDias);
-        String dataExtenso = data.getDisplayName(
-                Calendar.DAY_OF_WEEK,
-                Calendar.LONG,
-                new Locale("pt", "BR")
-        );
-        description.appendText(dataExtenso);
+        Date dataEsperada = DataUtils.obterDataComDiferencaDias(qtdDias);
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY");
+        description.appendText(dateFormat.format(dataEsperada));
     }
 }

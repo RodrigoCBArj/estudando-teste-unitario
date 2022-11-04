@@ -84,4 +84,14 @@ public class LocacaoService {
 				emailService.notificarAtrasos(l.getUsuario());
 		}
 	}
+
+	public void prorrogarLocacao(Locacao locacao, int dias) {
+		Locacao novaLocacao = new Locacao();
+		novaLocacao.setFilmes(locacao.getFilmes());
+		novaLocacao.setUsuario(locacao.getUsuario());
+		novaLocacao.setValor(locacao.getValor() * dias);
+		novaLocacao.setDataLocacao(locacao.getDataLocacao());
+		novaLocacao.setDataRetorno(DataUtils.obterDataComDiferencaDias(dias));
+		locacaoDAO.salvar(novaLocacao);
+	}
 }
