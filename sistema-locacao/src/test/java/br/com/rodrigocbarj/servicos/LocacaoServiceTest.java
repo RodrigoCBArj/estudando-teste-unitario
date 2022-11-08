@@ -10,42 +10,35 @@ import br.com.rodrigocbarj.entidades.Locacao;
 import br.com.rodrigocbarj.entidades.Usuario;
 import br.com.rodrigocbarj.exceptions.FilmeSemEstoqueException;
 import br.com.rodrigocbarj.exceptions.LocadoraException;
-import br.com.rodrigocbarj.utils.DataUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.*;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import static br.com.rodrigocbarj.builders.FilmeBuilder.umFilme;
 import static br.com.rodrigocbarj.builders.FilmeBuilder.umFilmeSemEstoque;
 import static br.com.rodrigocbarj.builders.LocacaoBuilder.umaLocacao;
 import static br.com.rodrigocbarj.builders.UsuarioBuilder.umUsuario;
-import static br.com.rodrigocbarj.matchers.MatcherProprio.*;
+import static br.com.rodrigocbarj.matchers.MatcherProprio.caiNaSegunda;
+import static br.com.rodrigocbarj.matchers.MatcherProprio.hojeComAdicaoDias;
+import static br.com.rodrigocbarj.utils.DataUtils.isMesmaData;
 import static br.com.rodrigocbarj.utils.DataUtils.obterData;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
-@PowerMockIgnore("jdk.internal.reflect.*")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({LocacaoService.class, DataUtils.class})
 public class LocacaoServiceTest {
 
     @InjectMocks
+    @Spy
     private LocacaoService locacaoService;
 
     @Mock
@@ -64,7 +57,6 @@ public class LocacaoServiceTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        locacaoService = PowerMockito.spy(locacaoService);
     }
 
     @Test
@@ -75,16 +67,15 @@ public class LocacaoServiceTest {
         filmes.add(umFilme().comValor(8d).finalizado());
         filmes.add(umFilme().comValor(5d).finalizado());
 
-        PowerMockito.whenNew(Date.class).withNoArguments()
-                .thenReturn(obterData(04, 11, 2022));
+        doReturn(obterData(04, 11, 2022)).when(locacaoService).obterData();
 
         // ação
         Locacao locacao = locacaoService.alugarFilme(u, filmes);
 
         // verificações
         error.checkThat(locacao.getValor(), is(13.0));
-        error.checkThat(locacao.getDataLocacao(), ehHoje());
-        error.checkThat(locacao.getDataRetorno(), hojeComAdicaoDias(1));
+        error.checkThat(isMesmaData(locacao.getDataLocacao(), obterData(04, 11, 2022)), is(true));
+        error.checkThat(isMesmaData(locacao.getDataRetorno(), obterData(05, 11, 2022)), is(true));
     }
 
     @Test
@@ -136,13 +127,11 @@ public class LocacaoServiceTest {
         Usuario u = umUsuario().finalizado();
         List<Filme> filmes = new ArrayList<>(Arrays.asList(umFilme().finalizado()));
 
-        PowerMockito.whenNew(Date.class).withNoArguments()
-                .thenReturn(obterData(05, 11, 2022));
+        doReturn(obterData(05, 11, 2022)).when(locacaoService).obterData();
 
         Locacao locacao = locacaoService.alugarFilme(u, filmes);
 
-//        error.checkThat(locacao.getDataRetorno(), caiEm(Calendar.MONDAY)); // também funcona
-        error.checkThat(locacao.getDataRetorno(), caiNaSegunda()); // mais legível
+        error.checkThat(locacao.getDataRetorno(), caiNaSegunda());
     }
 
     @Test
@@ -227,7 +216,10 @@ public class LocacaoServiceTest {
     public void deveCalcularValorTotal() throws Exception {
         List<Filme> filmes = Arrays.asList(umFilme().finalizado());
 
-        Double valorTotal = (Double) Whitebox.invokeMethod(locacaoService, "calcularValorTotal", filmes);
+        Class<LocacaoService> locacaoServiceClass = LocacaoService.class;
+        Method metodo = locacaoServiceClass.getDeclaredMethod("calcularValorTotal", List.class);
+        metodo.setAccessible(true);
+        Double valorTotal = (Double) metodo.invoke(locacaoService, filmes);
 
         error.checkThat(valorTotal, is(4.0));
     }

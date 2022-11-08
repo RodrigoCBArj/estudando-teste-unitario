@@ -42,11 +42,11 @@ public class LocacaoService {
 		Locacao locacao = new Locacao();
 		locacao.setUsuario(usuario);
 		locacao.setFilmes(filmes);
-		locacao.setDataLocacao(new Date());
+		locacao.setDataLocacao(obterData());
 		locacao.setValor(calcularValorTotal(filmes));
 
 		//Entrega no dia seguinte
-		Date dataEntrega = new Date();
+		Date dataEntrega = obterData();
 		dataEntrega = adicionarDias(dataEntrega, 1);
 		if (DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)) {
 			dataEntrega = adicionarDias(dataEntrega, 1);
@@ -59,7 +59,11 @@ public class LocacaoService {
 		return locacao;
 	}
 
-	private static Double calcularValorTotal(List<Filme> filmes) throws FilmeSemEstoqueException {
+	protected Date obterData() {
+		return new Date();
+	}
+
+	private Double calcularValorTotal(List<Filme> filmes) throws FilmeSemEstoqueException {
 		Double valorTotal = 0.0;
 		for (int i = 0; i < filmes.size(); i++) {
 			Filme filme = filmes.get(i);
@@ -82,7 +86,7 @@ public class LocacaoService {
 	public void notificarAtrasos() {
 		List<Locacao> locacoes = locacaoDAO.obterLocacoesAtrasadas();
 		for (Locacao l : locacoes) {
-			if (l.getDataRetorno().before(new Date()))
+			if (l.getDataRetorno().before(obterData()))
 				emailService.notificarAtrasos(l.getUsuario());
 		}
 	}
