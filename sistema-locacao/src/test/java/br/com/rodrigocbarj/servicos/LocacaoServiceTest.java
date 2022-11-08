@@ -22,6 +22,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +64,7 @@ public class LocacaoServiceTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
+        locacaoService = PowerMockito.spy(locacaoService);
     }
 
     @Test
@@ -74,7 +76,7 @@ public class LocacaoServiceTest {
         filmes.add(umFilme().comValor(5d).finalizado());
 
         PowerMockito.whenNew(Date.class).withNoArguments()
-                .thenReturn(obterData(04,11,2022));
+                .thenReturn(obterData(04, 11, 2022));
 
         // ação
         Locacao locacao = locacaoService.alugarFilme(u, filmes);
@@ -135,7 +137,7 @@ public class LocacaoServiceTest {
         List<Filme> filmes = new ArrayList<>(Arrays.asList(umFilme().finalizado()));
 
         PowerMockito.whenNew(Date.class).withNoArguments()
-                .thenReturn(obterData(05,11, 2022));
+                .thenReturn(obterData(05, 11, 2022));
 
         Locacao locacao = locacaoService.alugarFilme(u, filmes);
 
@@ -150,7 +152,7 @@ public class LocacaoServiceTest {
         List<Filme> filmes = Arrays.asList(umFilme().finalizado());
 
         when(serasaService.possuiNegativacao(any(Usuario.class))) //para qualquer instancia de Usuario
-                            .thenReturn(true);
+                .thenReturn(true);
 
         //ação:
         try {
@@ -219,5 +221,14 @@ public class LocacaoServiceTest {
 
         error.checkThat(locacaoRetornada.getValor(), is(12.0));
         error.checkThat(locacaoRetornada.getDataRetorno(), is(hojeComAdicaoDias(3)));
+    }
+
+    @Test
+    public void deveCalcularValorTotal() throws Exception {
+        List<Filme> filmes = Arrays.asList(umFilme().finalizado());
+
+        Double valorTotal = (Double) Whitebox.invokeMethod(locacaoService, "calcularValorTotal", filmes);
+
+        error.checkThat(valorTotal, is(4.0));
     }
 }

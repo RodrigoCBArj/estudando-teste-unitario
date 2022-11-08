@@ -23,8 +23,6 @@ public class LocacaoService {
 	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes)
 			throws LocadoraException, FilmeSemEstoqueException
 	{
-		Double valorTotal = 0.0;
-
 		boolean negativado;
 		try {
 			negativado = serasaService.possuiNegativacao(usuario);
@@ -41,6 +39,28 @@ public class LocacaoService {
 		if (filmes == null || filmes.isEmpty())
 			throw new LocadoraException("Filme inexistente!");
 
+		Locacao locacao = new Locacao();
+		locacao.setUsuario(usuario);
+		locacao.setFilmes(filmes);
+		locacao.setDataLocacao(new Date());
+		locacao.setValor(calcularValorTotal(filmes));
+
+		//Entrega no dia seguinte
+		Date dataEntrega = new Date();
+		dataEntrega = adicionarDias(dataEntrega, 1);
+		if (DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)) {
+			dataEntrega = adicionarDias(dataEntrega, 1);
+		}
+		locacao.setDataRetorno(dataEntrega);
+
+		//Salvando a locacao...
+		locacaoDAO.salvar(locacao);
+
+		return locacao;
+	}
+
+	private static Double calcularValorTotal(List<Filme> filmes) throws FilmeSemEstoqueException {
+		Double valorTotal = 0.0;
 		for (int i = 0; i < filmes.size(); i++) {
 			Filme filme = filmes.get(i);
 			if (filme.getEstoque() < 1 || filme.getEstoque() == null) {
@@ -56,25 +76,7 @@ public class LocacaoService {
 			}
 			valorTotal += valorFilme;
 		}
-
-		Locacao locacao = new Locacao();
-		locacao.setUsuario(usuario);
-		locacao.setFilmes(filmes);
-		locacao.setDataLocacao(new Date());
-		locacao.setValor(valorTotal);
-
-		//Entrega no dia seguinte
-		Date dataEntrega = new Date();
-		dataEntrega = adicionarDias(dataEntrega, 1);
-		if (DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)) {
-			dataEntrega = adicionarDias(dataEntrega, 1);
-		}
-		locacao.setDataRetorno(dataEntrega);
-
-		//Salvando a locacao...
-		locacaoDAO.salvar(locacao);
-
-		return locacao;
+		return valorTotal;
 	}
 
 	public void notificarAtrasos() {
