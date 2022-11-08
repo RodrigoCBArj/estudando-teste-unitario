@@ -10,14 +10,12 @@ import br.com.rodrigocbarj.entidades.Locacao;
 import br.com.rodrigocbarj.entidades.Usuario;
 import br.com.rodrigocbarj.exceptions.FilmeSemEstoqueException;
 import br.com.rodrigocbarj.exceptions.LocadoraException;
-import br.com.rodrigocbarj.runners.ParallelRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.*;
 
 import java.lang.reflect.Method;
@@ -38,7 +36,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
-@RunWith(ParallelRunner.class)
 public class LocacaoServiceTest {
 
     @InjectMocks
@@ -61,12 +58,6 @@ public class LocacaoServiceTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        System.out.println("iniciando");
-    }
-
-    @After
-    public void end(){
-        System.out.println("finalizando");
     }
 
     @Test
